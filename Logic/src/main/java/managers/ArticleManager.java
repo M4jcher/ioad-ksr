@@ -14,12 +14,16 @@ public class ArticleManager {
     private LinkedList<Article>[][] confusionMatrix;
     private LinkedList<Article> trainData;
     private LinkedList<Article> testData;
+    private double[][] measures;
+    private double accuracy;
 
     public ArticleManager() {
-        confusionMatrix = new LinkedList[6][];
-        for (int i = 0; i < 6; i++) {
-            confusionMatrix[i] = new LinkedList[6];
-            for (int j = 0; j < 6; j++) {
+        confusionMatrix = new LinkedList[countries.length][];
+        measures = new double[countries.length+1][];
+        for (int i = 0; i < countries.length; i++) {
+            confusionMatrix[i] = new LinkedList[countries.length];
+            measures[i] = new double[3];
+            for (int j = 0; j < countries.length; j++) {
                 confusionMatrix[i][j] = new LinkedList<Article>();
             }
         }
@@ -123,9 +127,64 @@ public class ArticleManager {
         }
     }
 
+    public void calculateMeasures() {
+        this.accuracy = calculateAccuracy();
+        calculatePrecision();
+        calculateRecall();
+        calculateF1();
+        calculateForAll();
+    }
+
+    private double calculateAccuracy() {
+        int sum = 0;
+        for (int i = 0; i < countries.length; i++) {
+            sum += confusionMatrix[i][i].size();
+        }
+        return sum * 1.0 / allArticles.size();
+    }
+
+    private void calculatePrecision() {
+        for (int i = 0; i < countries.length; i++) {
+            int sum = 0;
+            for (int j = 0; j < countries.length; j++) {
+                sum += confusionMatrix[i][j].size();
+            }
+            measures[i][0] = confusionMatrix[i][i].size() * 1.0 / sum;
+        }
+    }
+
+    private void calculateRecall() {
+        for (int i = 0; i < countries.length; i++) {
+            int sum = 0;
+            for (int j = 0; j < countries.length; j++) {
+                sum += confusionMatrix[j][i].size();
+            }
+            measures[i][1] = confusionMatrix[i][i].size() * 1.0 / sum;
+        }
+    }
+
+    private void calculateF1() {
+        for (int i = 0; i < countries.length; i++) {
+            measures[i][2] = (2 * measures[i][0] * measures[i][1]) / (measures[i][0] + measures[i][1]);
+        }
+    }
+
+    private void calculateForAll() {
+        measures[countries.length] = new double[3];
+        for (int i = 0; i < 3; i++) {
+            int sumWeight = 0;
+            double sumMeasure = 0;
+            for (int j = 0; j < countries.length; j++) {
+                sumWeight += confusionMatrix[j][j].size();
+                sumMeasure += measures[j][i] * confusionMatrix[j][j].size();
+            }
+            measures[countries.length][i] = sumMeasure / sumWeight;
+        }
+    }
+
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ArticleManager{");
+        final StringBuilder sb = new StringBuilder();
         sb.append("countries=").append(Arrays.toString(countries)).append("\n");
         for (int i = 0; i < countries.length; i++) {
             for (int j = 0; j < countries.length; j++) {
@@ -133,6 +192,20 @@ public class ArticleManager {
             }
             sb.append("\n");
         }
+        sb.append("\n");
+        sb.append("Precision\t\tRecall\t\tF1\t\t\n");
+        for (int i = 0; i < countries.length; i++) {
+            for (int j = 0; j < 3; j++) {
+                sb.append(measures[i][j]).append("\t\t");
+            }
+            sb.append("\n");
+        }
+        sb.append("for whole project:").append("\n");
+        for (int i = 0; i < 3; i++) {
+            sb.append(measures[countries.length][i]).append("\t\t");
+        }
+        sb.append("\n");
+        sb.append("Accuracy = ").append(this.accuracy).append("\n");
         return sb.toString();
     }
 
@@ -143,6 +216,7 @@ public class ArticleManager {
         boolean[] traitsUsed = new boolean[15];
         Arrays.fill(traitsUsed, true);
         articleManager.kNN(3, traitsUsed, 0);
+        articleManager.calculateMeasures();
         System.out.println(articleManager.toString());
     }
 }
