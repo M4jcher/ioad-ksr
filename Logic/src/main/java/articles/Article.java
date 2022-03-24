@@ -36,31 +36,47 @@ public class Article {
         return sb.toString();
     }
 
-    double getTaxiDistance(Article article) {
+    public double getDistanceTo(Article article, boolean[] traitUsed, int metricUsed) {
+        if (metricUsed == 0) {
+            return getEuclidesDistance(article, traitUsed);
+        } else if (metricUsed == 1) {
+            return getTaxiDistance(article, traitUsed);
+        } else {
+            return getChebyshevDistance(article, traitUsed);
+        }
+    }
+
+    public double getTaxiDistance(Article article, boolean[] traitUsed) {
         double sum = 0;
         for (int i = 0; i < traits.length; i++) {
-            sum += Math.abs(this.traits[i].getDistanceTo(article.traits[i]));
+            if (traitUsed[i]) {
+                sum += Math.abs(this.traits[i].getDistanceTo(article.traits[i]));
+            }
         }
         return sum;
     }
 
-    double getEuclidesDistance(Article article) {
+    public double getEuclidesDistance(Article article, boolean[] traitUsed) {
         double sum = 0;
         for (int i = 0; i < traits.length; i++) {
-            double dist = Math.abs(this.traits[i].getDistanceTo(article.traits[i]));
-            sum += dist * dist;
+            if (traitUsed[i]) {
+                double dist = Math.abs(this.traits[i].getDistanceTo(article.traits[i]));
+                sum += dist * dist;
+            }
         }
         sum = Math.sqrt(sum);
         return sum;
     }
 
-    double getChebyshevDistance(Article article) {
+    public double getChebyshevDistance(Article article, boolean[] traitUsed) {
         double max = 0;
         for (int i = 0; i < traits.length; i++) {
-            double tmp;
-            tmp = Math.abs(this.traits[i].getDistanceTo(article.traits[i]));
-            if (tmp > max) {
-                max = tmp;
+            if (traitUsed[i]) {
+                double tmp;
+                tmp = Math.abs(this.traits[i].getDistanceTo(article.traits[i]));
+                if (tmp > max) {
+                    max = tmp;
+                }
             }
         }
         return max;

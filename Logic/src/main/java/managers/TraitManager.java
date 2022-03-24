@@ -57,13 +57,13 @@ public class TraitManager {
         int index = -1;
         for (int i = 0; i < dict.length; i++) {
             int tmp = text.toLowerCase().indexOf(dict[i].toLowerCase());
-            if ((tmp > 0) && (tmp < min)) {
+            if ((tmp >= 0) && (tmp < min)) {
                 min = tmp;
                 index = i;
             }
         }
         if (index == -1) {
-            return "Empty";
+            return "";
         }
         return dict[index];
     }
