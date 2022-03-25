@@ -1,5 +1,6 @@
 package managers;
 
+import org.apache.commons.lang.StringUtils;
 import traits.NumberTrait;
 import traits.Trait;
 import traits.WordTrait;
@@ -41,12 +42,12 @@ public class TraitManager {
         exit[1] = new WordTrait(getFirstOccurrence(text, regions));
         exit[2] = new WordTrait(getFirstOccurrence(text, continents));
         exit[3] = new WordTrait(getFirstOccurrence(text, currency));
-        exit[4] = new WordTrait(getFirstOccurrence(text, units));
+        exit[4] = new WordTrait(getMostOccurrence(text, units));
         exit[5] = new WordTrait(getFirstOccurrence(text, firms));
         exit[6] = new WordTrait(getFirstOccurrence(text, countries1));
         exit[7] = new WordTrait(getFirstOccurrence(text, buildings));
         for (int i = 0; i < 6; i++) {
-            exit[8+i] = new NumberTrait(countOccurrences(text,countries2[i]));
+            exit[8 + i] = new NumberTrait(countOccurrences(text, countries2[i]));
         }
         exit[14] = new NumberTrait(text.split(" ").length);
         return exit;
@@ -82,5 +83,22 @@ public class TraitManager {
             }
         }
         return sum;
+    }
+
+    private static String getMostOccurrence(String text, String[] dict) {
+        int[] occurrences = new int[dict.length];
+        for (int i = 0; i < dict.length; i++) {
+            occurrences[i] = StringUtils.countMatches(text, dict[i]);
+        }
+
+        int max = 0;
+        int index = -1;
+        for (int i = 0; i < dict.length; i++) {
+            if (occurrences[i] > max) {
+                max = occurrences[i];
+                index = i;
+            }
+        }
+        return dict[index];
     }
 }

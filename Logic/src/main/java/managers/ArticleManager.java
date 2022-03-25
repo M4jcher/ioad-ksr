@@ -24,12 +24,12 @@ public class ArticleManager {
             confusionMatrix[i] = new LinkedList[countries.length];
             measures[i] = new double[3];
             for (int j = 0; j < countries.length; j++) {
-                confusionMatrix[i][j] = new LinkedList<Article>();
+                confusionMatrix[i][j] = new LinkedList<>();
             }
         }
-        trainData = new LinkedList<Article>();
-        testData = new LinkedList<Article>();
-        allArticles = new LinkedList<Article>();
+        trainData = new LinkedList<>();
+        testData = new LinkedList<>();
+        allArticles = new LinkedList<>();
     }
 
     public void readArticles(String filename) throws IOException {
@@ -64,11 +64,11 @@ public class ArticleManager {
     }
 
     public void kNN(int k, boolean[] traitsUsed, int metricUsed) {
-        for (int i = 0; i < testData.size(); i++) {
+        for (Article testDatum : testData) {
             Map<Integer, Double> nearest = new HashMap<>();
             ArrayList<Double> distances = new ArrayList<>();
             for (int j = 0; j < trainData.size(); j++) {
-                double dist = testData.get(i).getDistanceTo(trainData.get(j), traitsUsed, metricUsed);
+                double dist = testDatum.getDistanceTo(trainData.get(j), traitsUsed, metricUsed);
                 if (nearest.size() < k) {
                     nearest.put(j, dist);
                     distances.add(dist);
@@ -98,8 +98,8 @@ public class ArticleManager {
                     index = j;
                 }
             }
-            testData.get(i).setPredictedValue(countries[index]);
-            putIntoConfusionMatrix(testData.get(i));
+            testDatum.setPredictedValue(countries[index]);
+            putIntoConfusionMatrix(testDatum);
         }
 
     }
