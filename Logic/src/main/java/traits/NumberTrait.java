@@ -7,6 +7,11 @@ public class NumberTrait extends Trait {
         this.value = value;
     }
 
+//    public double getDistanceTo(Trait second) {
+//        NumberTrait trait = (NumberTrait) second;
+//        return this.value -  trait.value;
+//    }
+
     public double getDistanceTo(Trait second) {
         NumberTrait trait = (NumberTrait) second;
         return this.value.compareTo(trait.value);

@@ -215,7 +215,7 @@ public class ArticleManager {
         articleManager.splitDataToTrainAndTest(20);
         boolean[] traitsUsed = new boolean[15];
         Arrays.fill(traitsUsed, true);
-        articleManager.kNN(3, traitsUsed, 0);
+        articleManager.kNN(5, traitsUsed, 0);
         articleManager.calculateMeasures();
         System.out.println(articleManager.toString());
     }

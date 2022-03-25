@@ -64,7 +64,7 @@ public class TraitManager {
             }
         }
         if (index == -1) {
-            return "";
+            return " ";
         }
         return dict[index];
     }
@@ -98,6 +98,9 @@ public class TraitManager {
                 max = occurrences[i];
                 index = i;
             }
+        }
+        if (index == -1) {
+            return " ";
         }
         return dict[index];
     }
