@@ -40,11 +40,11 @@ public class TraitManager {
         Trait[] exit = new Trait[15];
         exit[0] = new WordTrait(getFirstOccurrence(text, people));
         exit[1] = new WordTrait(getFirstOccurrence(text, regions));
-        exit[2] = new WordTrait(getFirstOccurrence(text, continents));
+        exit[2] = new WordTrait(getMostOccurrence(text, continents));
         exit[3] = new WordTrait(getFirstOccurrence(text, currency));
         exit[4] = new WordTrait(getMostOccurrence(text, units));
         exit[5] = new WordTrait(getFirstOccurrence(text, firms));
-        exit[6] = new WordTrait(getFirstOccurrence(text, countries1));
+        exit[6] = new WordTrait(getMostOccurrence(text, countries1));
         exit[7] = new WordTrait(getFirstOccurrence(text, buildings));
         for (int i = 0; i < 6; i++) {
             exit[8 + i] = new NumberTrait(countOccurrences(text, countries2[i]));
@@ -64,7 +64,7 @@ public class TraitManager {
             }
         }
         if (index == -1) {
-            return " ";
+            return "";
         }
         return dict[index];
     }
@@ -100,7 +100,7 @@ public class TraitManager {
             }
         }
         if (index == -1) {
-            return " ";
+            return "";
         }
         return dict[index];
     }

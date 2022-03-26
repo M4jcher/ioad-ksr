@@ -6,37 +6,45 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class ArticleManager {
     final private String[] countries = {"usa", "uk", "canada", "west-germany", "france", "japan"};
     private LinkedList<Article> allArticles;
-    private LinkedList<Article>[][] confusionMatrix;
+    //private LinkedList<Article>[][] confusionMatrix;
+    private int[][] confusionMatrix;
     private LinkedList<Article> trainData;
     private LinkedList<Article> testData;
     private double[][] measures;
     private double accuracy;
 
     public ArticleManager() {
-        confusionMatrix = new LinkedList[countries.length][];
+//        confusionMatrix = new LinkedList[countries.length][];
+        confusionMatrix = new int[countries.length][];
         measures = new double[countries.length+1][];
         for (int i = 0; i < countries.length; i++) {
-            confusionMatrix[i] = new LinkedList[countries.length];
+//            confusionMatrix[i] = new LinkedList[countries.length];
+            confusionMatrix[i] = new int[countries.length];
             measures[i] = new double[3];
-            for (int j = 0; j < countries.length; j++) {
-                confusionMatrix[i][j] = new LinkedList<>();
-            }
+//            for (int j = 0; j < countries.length; j++) {
+//                confusionMatrix[i][j] = new LinkedList<>();
+//            }
         }
         trainData = new LinkedList<>();
         testData = new LinkedList<>();
         allArticles = new LinkedList<>();
     }
 
-    public void readArticles(String filename) throws IOException {
+    public void readArticles(File file) throws IOException {
         String start = "<REUTERS";
         String end = "</REUTERS";
         String placesStart = "<PLACES>";
-        BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
+        BufferedReader reader = new BufferedReader(new FileReader(file));
         StringBuilder article = new StringBuilder();
         String trueValue = "None";
         String tmp = reader.readLine();
@@ -65,26 +73,20 @@ public class ArticleManager {
 
     public void kNN(int k, boolean[] traitsUsed, int metricUsed) {
         for (Article testDatum : testData) {
-            Map<Integer, Double> nearest = new HashMap<>();
-            ArrayList<Double> distances = new ArrayList<>();
+            Map<Integer, Double> distances = new HashMap<>();
             for (int j = 0; j < trainData.size(); j++) {
                 double dist = testDatum.getDistanceTo(trainData.get(j), traitsUsed, metricUsed);
-                if (nearest.size() < k) {
-                    nearest.put(j, dist);
-                    distances.add(dist);
-                    Collections.sort(distances);
-                } else if (distances.get(k - 1) > dist) {
-                    nearest.values().remove(distances.remove(k - 1));
-                    nearest.put(j, dist);
-                    distances.add(dist);
-                    Collections.sort(distances);
-                }
+                distances.put(j,dist);
             }
+            List<Map.Entry<Integer, Double>> nearest = distances.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .limit(k).toList();
+
             int[] numOfNeighbours = new int[countries.length];
-            Integer[] keys = nearest.keySet().toArray(new Integer[k]);
             for (int j = 0; j < k; j++) {
                 for (int l = 0; l < countries.length; l++) {
-                    if (trainData.get(keys[j]).getTrueValue().equals(countries[l])) {
+                    if (trainData.get(nearest.get(j).getKey()).getTrueValue().equals(countries[l])) {
                         numOfNeighbours[l] += 1;
                         break;
                     }
@@ -114,7 +116,7 @@ public class ArticleManager {
                 indexPredicted = i;
             }
         }
-        confusionMatrix[indexTrue][indexPredicted].add(article);
+        confusionMatrix[indexTrue][indexPredicted]++;
     }
 
     public void splitDataToTrainAndTest(int trainPct) {
@@ -138,7 +140,8 @@ public class ArticleManager {
     private double calculateAccuracy() {
         int sum = 0;
         for (int i = 0; i < countries.length; i++) {
-            sum += confusionMatrix[i][i].size();
+//            sum += confusionMatrix[i][i].size();
+            sum += confusionMatrix[i][i];
         }
         return sum * 1.0 / allArticles.size();
     }
@@ -147,9 +150,11 @@ public class ArticleManager {
         for (int i = 0; i < countries.length; i++) {
             int sum = 0;
             for (int j = 0; j < countries.length; j++) {
-                sum += confusionMatrix[i][j].size();
+//                sum += confusionMatrix[i][j].size();
+                sum += confusionMatrix[i][j];
             }
-            measures[i][0] = confusionMatrix[i][i].size() * 1.0 / sum;
+//            measures[i][0] = confusionMatrix[i][i].size() * 1.0 / sum;
+            measures[i][0] = confusionMatrix[i][i] * 1.0 / sum;
         }
     }
 
@@ -157,9 +162,11 @@ public class ArticleManager {
         for (int i = 0; i < countries.length; i++) {
             int sum = 0;
             for (int j = 0; j < countries.length; j++) {
-                sum += confusionMatrix[j][i].size();
+//                sum += confusionMatrix[j][i].size();
+                sum += confusionMatrix[j][i];
             }
-            measures[i][1] = confusionMatrix[i][i].size() * 1.0 / sum;
+//            measures[i][1] = confusionMatrix[i][i].size() * 1.0 / sum;
+            measures[i][1] = confusionMatrix[i][i] * 1.0 / sum;
         }
     }
 
@@ -175,11 +182,29 @@ public class ArticleManager {
             int sumWeight = 0;
             double sumMeasure = 0;
             for (int j = 0; j < countries.length; j++) {
-                sumWeight += confusionMatrix[j][j].size();
-                sumMeasure += measures[j][i] * confusionMatrix[j][j].size();
+//                sumWeight += confusionMatrix[j][j].size();
+//                sumMeasure += measures[j][i] * confusionMatrix[j][j].size();
+                sumWeight += confusionMatrix[j][j];
+                sumMeasure += measures[j][i] * confusionMatrix[j][j];
             }
             measures[countries.length][i] = sumMeasure / sumWeight;
         }
+    }
+
+    public String[] getCountries() {
+        return countries;
+    }
+
+    public int getConfusionMatrix(int x, int y) {
+        return confusionMatrix[x][y];
+    }
+
+    public double getAccuracy() {
+        return accuracy;
+    }
+
+    public double[][] getMeasures() {
+        return measures;
     }
 
     @Override
@@ -188,7 +213,8 @@ public class ArticleManager {
         sb.append("countries=").append(Arrays.toString(countries)).append("\n");
         for (int i = 0; i < countries.length; i++) {
             for (int j = 0; j < countries.length; j++) {
-                sb.append(confusionMatrix[i][j].size()).append("\t\t");
+//                sb.append(confusionMatrix[i][j].size()).append("\t\t");
+                sb.append(confusionMatrix[i][j]).append("\t\t");
             }
             sb.append("\n");
         }
@@ -207,16 +233,5 @@ public class ArticleManager {
         sb.append("\n");
         sb.append("Accuracy = ").append(this.accuracy).append("\n");
         return sb.toString();
-    }
-
-    public static void main(String[] args) throws IOException {
-        ArticleManager articleManager = new ArticleManager();
-        articleManager.readArticles("D:\\pulpit\\studia\\semestr6\\KomputeroweSystemyRozpoznawania\\Projekt1\\mavenProject\\Logic\\src\\main\\resources\\exit.txt");
-        articleManager.splitDataToTrainAndTest(20);
-        boolean[] traitsUsed = new boolean[15];
-        Arrays.fill(traitsUsed, true);
-        articleManager.kNN(5, traitsUsed, 0);
-        articleManager.calculateMeasures();
-        System.out.println(articleManager.toString());
     }
 }

@@ -9,7 +9,7 @@ public class NumberTrait extends Trait {
 
 //    public double getDistanceTo(Trait second) {
 //        NumberTrait trait = (NumberTrait) second;
-//        return this.value -  trait.value;
+//        return (this.value -  trait.value) / 10.0;
 //    }
 
     public double getDistanceTo(Trait second) {
