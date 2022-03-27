@@ -47,6 +47,8 @@ public class MainController {
     public Button runClassificationButton;
     public Button loadArticlesButton;
     public VBox traitsList;
+    private Text[][] confusionMatrix = new Text[6][6];
+    private Text[][] measures = new Text[7][3];
 
     @FXML
     public void initialize() {
@@ -75,6 +77,29 @@ public class MainController {
             GridPane.setHalignment(tmp3, HPos.CENTER);
             GridPane.setValignment(tmp3, VPos.CENTER);
         }
+
+        int amount = articleManager.getCountries().length;
+        for (int i = 0; i < amount+1; i++) {
+            for (int j = 0; j < 3; j++) {
+                Text text = new Text();
+                measures[i][j] = text;
+                measuresGrid.add(text,j+1,i+1);
+                GridPane.setValignment(text, VPos.CENTER);
+                GridPane.setHalignment(text, HPos.CENTER);
+
+            }
+        }
+
+        for (int i = 0; i < amount; i++) {
+            for (int j = 0; j < amount; j++) {
+                Text text = new Text();
+                confusionMatrix[i][j] = text;
+                confusionMatrixGrid.add(text,i+1,j+1);
+                GridPane.setValignment(text, VPos.CENTER);
+                GridPane.setHalignment(text, HPos.CENTER);
+            }
+        }
+
         LinkedList<String> metrics = new LinkedList<>();
         metrics.add("Euklidesowa");
         metrics.add("Taksówkowa");
@@ -116,10 +141,7 @@ public class MainController {
         for (int i = 0; i < amount; i++) {
             for (int j = 0; j < amount; j++) {
                 int tmp = articleManager.getConfusionMatrix(i,j);
-                Text text = new Text(String.valueOf(tmp));
-                confusionMatrixGrid.add(text,i+1,j+1);
-                GridPane.setHalignment(text, HPos.CENTER);
-                GridPane.setValignment(text, VPos.CENTER);
+                confusionMatrix[i][j].setText(String.valueOf(tmp));
             }
         }
     }
@@ -133,11 +155,7 @@ public class MainController {
             for (int j = 0; j < 3; j++) {
                 double value = measures[i][j];
                 String tmp = String.format("%.4g%n", value);
-                Text text = new Text();
-                measuresGrid.add(text,j+1,i+1);
-                GridPane.setHalignment(text, HPos.CENTER);
-                GridPane.setValignment(text, VPos.CENTER);
-                text.setText(tmp);
+                this.measures[i][j].setText(tmp);
             }
         }
     }

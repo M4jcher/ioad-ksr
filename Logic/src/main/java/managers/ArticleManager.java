@@ -120,6 +120,9 @@ public class ArticleManager {
     }
 
     public void splitDataToTrainAndTest(int trainPct) {
+        testData = new LinkedList<>();
+        trainData = new LinkedList<>();
+        confusionMatrix = new int[countries.length][countries.length];
         testData.addAll(allArticles);
         Random random = new Random();
         int amount = allArticles.size() * trainPct / 100;
@@ -143,15 +146,15 @@ public class ArticleManager {
 //            sum += confusionMatrix[i][i].size();
             sum += confusionMatrix[i][i];
         }
-        return sum * 1.0 / allArticles.size();
+        return sum * 1.0 / testData.size();
     }
 
     private void calculatePrecision() {
         for (int i = 0; i < countries.length; i++) {
             int sum = 0;
             for (int j = 0; j < countries.length; j++) {
-//                sum += confusionMatrix[i][j].size();
-                sum += confusionMatrix[i][j];
+//                sum += confusionMatrix[j][i].size();
+                sum += confusionMatrix[j][i];
             }
 //            measures[i][0] = confusionMatrix[i][i].size() * 1.0 / sum;
             measures[i][0] = confusionMatrix[i][i] * 1.0 / sum;
@@ -162,8 +165,8 @@ public class ArticleManager {
         for (int i = 0; i < countries.length; i++) {
             int sum = 0;
             for (int j = 0; j < countries.length; j++) {
-//                sum += confusionMatrix[j][i].size();
-                sum += confusionMatrix[j][i];
+//                sum += confusionMatrix[i][j].size();
+                sum += confusionMatrix[i][j];
             }
 //            measures[i][1] = confusionMatrix[i][i].size() * 1.0 / sum;
             measures[i][1] = confusionMatrix[i][i] * 1.0 / sum;
