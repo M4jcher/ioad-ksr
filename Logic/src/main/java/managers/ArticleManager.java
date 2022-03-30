@@ -15,12 +15,12 @@ import java.util.Random;
 
 public class ArticleManager {
     final private String[] countries = {"usa", "uk", "canada", "west-germany", "france", "japan"};
-    private LinkedList<Article> allArticles;
+    private final LinkedList<Article> allArticles;
     //private LinkedList<Article>[][] confusionMatrix;
     private int[][] confusionMatrix;
     private LinkedList<Article> trainData;
     private LinkedList<Article> testData;
-    private double[][] measures;
+    private final double[][] measures;
     private double accuracy;
 
     public ArticleManager() {
@@ -120,12 +120,15 @@ public class ArticleManager {
     }
 
     public void splitDataToTrainAndTest(int trainPct) {
+        int amount = allArticles.size() * trainPct / 100;
+        if (trainData.size() == amount) {
+            return;
+        }
         testData = new LinkedList<>();
         trainData = new LinkedList<>();
         confusionMatrix = new int[countries.length][countries.length];
         testData.addAll(allArticles);
         Random random = new Random();
-        int amount = allArticles.size() * trainPct / 100;
         for (int i = 0; i < amount; i++) {
             int index = random.nextInt(testData.size());
             trainData.add(testData.remove(index));
