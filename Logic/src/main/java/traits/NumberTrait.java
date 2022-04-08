@@ -1,23 +1,23 @@
 package traits;
 
 public class NumberTrait extends Trait {
-    private Integer value;
+    private Double value;
 
-    public NumberTrait(int value) {
+    public NumberTrait(Double value) {
         this.value = value;
+    }
+
+    public double getDistanceTo(Trait second) {
+        NumberTrait trait = (NumberTrait) second;
+        return (this.value -  trait.value);
     }
 
 //    public double getDistanceTo(Trait second) {
 //        NumberTrait trait = (NumberTrait) second;
-//        return (this.value -  trait.value) / 10.0;
+//        return this.value.compareTo(trait.value);
 //    }
 
-    public double getDistanceTo(Trait second) {
-        NumberTrait trait = (NumberTrait) second;
-        return this.value.compareTo(trait.value);
-    }
-
-    public Integer getValue() {
+    public Double getValue() {
         return value;
     }
 

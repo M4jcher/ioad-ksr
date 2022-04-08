@@ -72,6 +72,7 @@ public class ArticleManager {
     }
 
     public void kNN(int k, boolean[] traitsUsed, int metricUsed) {
+        confusionMatrix = new int[countries.length][countries.length];
         for (Article testDatum : testData) {
             Map<Integer, Double> distances = new HashMap<>();
             for (int j = 0; j < trainData.size(); j++) {
@@ -126,7 +127,6 @@ public class ArticleManager {
         }
         testData = new LinkedList<>();
         trainData = new LinkedList<>();
-        confusionMatrix = new int[countries.length][countries.length];
         testData.addAll(allArticles);
         Random random = new Random();
         for (int i = 0; i < amount; i++) {
@@ -141,6 +141,7 @@ public class ArticleManager {
         calculateRecall();
         calculateF1();
         calculateForAll();
+        System.out.println(this);
     }
 
     private double calculateAccuracy() {
@@ -224,20 +225,12 @@ public class ArticleManager {
             }
             sb.append("\n");
         }
-        sb.append("\n");
-        sb.append("Precision\t\tRecall\t\tF1\t\t\n");
-        for (int i = 0; i < countries.length; i++) {
-            for (int j = 0; j < 3; j++) {
-                sb.append(measures[i][j]).append("\t\t");
-            }
-            sb.append("\n");
-        }
-        sb.append("for whole project:").append("\n");
+        sb.append("Accuracy = ").append("\n").append(this.accuracy).append("\n");
         for (int i = 0; i < 3; i++) {
-            sb.append(measures[countries.length][i]).append("\t\t");
+            for (int j = 0; j < countries.length+1; j++) {
+                sb.append(measures[j][i]).append("\n");
+            }
         }
-        sb.append("\n");
-        sb.append("Accuracy = ").append(this.accuracy).append("\n");
         return sb.toString();
     }
 }

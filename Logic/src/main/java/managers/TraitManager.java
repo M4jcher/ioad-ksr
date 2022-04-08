@@ -40,16 +40,16 @@ public class TraitManager {
         Trait[] exit = new Trait[15];
         exit[0] = new WordTrait(getFirstOccurrence(text, people));
         exit[1] = new WordTrait(getFirstOccurrence(text, regions));
-        exit[2] = new WordTrait(getMostOccurrence(text, continents));
-        exit[3] = new WordTrait(getFirstOccurrence(text, currency));
+        exit[2] = new WordTrait(getFirstOccurrence(text, continents));
+        exit[3] = new WordTrait(getMostOccurrence(text, currency));
         exit[4] = new WordTrait(getMostOccurrence(text, units));
         exit[5] = new WordTrait(getFirstOccurrence(text, firms));
-        exit[6] = new WordTrait(getMostOccurrence(text, countries1));
+        exit[6] = new WordTrait(getFirstOccurrence(text, countries1));
         exit[7] = new WordTrait(getFirstOccurrence(text, buildings));
         for (int i = 0; i < 6; i++) {
-            exit[8 + i] = new NumberTrait(countOccurrences(text, countries2[i]));
+            exit[8 + i] = new NumberTrait(countOccurrences(text, countries2[i]) * 1.0 /10);
         }
-        exit[14] = new NumberTrait(text.split(" ").length);
+        exit[14] = new NumberTrait(text.split(" ").length * 1.0 / 1000);
         return exit;
     }
 
@@ -69,9 +69,9 @@ public class TraitManager {
         return dict[index];
     }
 
-    private static int countOccurrences(String text, String[] dict) {
+    private static Integer countOccurrences(String text, String[] dict) {
         text = text.toLowerCase();
-        int sum = 0;
+        Integer sum = 0;
         for (String s : dict) {
             int lastIndex = 0;
             while (lastIndex != -1) {
